@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLP Q&A System - SORETIRE OLUWANIFEMI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>NLP Question-and-Answering System</h1>
+            <p class="author">By SORETIRE OLUWANIFEMI | Matric: 23ch034242</p>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <h2>Ask a Question</h2>
+                <div class="question-form">
+                    <textarea
+                        id="question-input"
+                        placeholder="Enter your question here..."
+                        rows="3"
+                    ></textarea>
+                    <button id="submit-btn" onclick="submitQuestion()">
+                        <span id="btn-text">Get Answer</span>
+                        <span id="loading" class="hidden">Processing...</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="results" class="results-section hidden">
+                <div class="result-card">
+                    <h3>Original Question</h3>
+                    <p id="original-question"></p>
+                </div>
+
+                <div class="result-card">
+                    <h3>Processed Question</h3>
+                    <p id="processed-question"></p>
+                    <div class="tokens-container">
+                        <strong>Tokens:</strong>
+                        <span id="tokens"></span>
+                    </div>
+                </div>
+
+                <div class="result-card answer-card">
+                    <h3>LLM Response</h3>
+                    <div id="answer"></div>
+                </div>
+            </div>
+
+            <div id="error-message" class="error-section hidden">
+                <p id="error-text"></p>
+            </div>
+        </main>
+
+        <footer>
+            <p>Powered by Groq LLM API | NLP Project 2024</p>
+        </footer>
+    </div>
+
+    <script>
+        async function submitQuestion() {
+            const questionInput = document.getElementById('question-input');
+            const question = questionInput.value.trim();
+
+            if (!question) {
+                showError('Please enter a question.');
+                return;
+            }
+
+            // Show loading state
+            const btnText = document.getElementById('btn-text');
+            const loading = document.getElementById('loading');
+            const submitBtn = document.getElementById('submit-btn');
+
+            btnText.classList.add('hidden');
+            loading.classList.remove('hidden');
+            submitBtn.disabled = true;
+
+            // Hide previous results/errors
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('error-message').classList.add('hidden');
+
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question: question })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Display results
+                    document.getElementById('original-question').textContent = data.original_question;
+                    document.getElementById('processed-question').textContent = data.processed_question;
+                    document.getElementById('tokens').textContent = data.tokens.join(', ');
+                    document.getElementById('answer').innerHTML = formatAnswer(data.answer);
+                    document.getElementById('results').classList.remove('hidden');
+                } else {
+                    showError(data.error);
+                }
+            } catch (error) {
+                showError('Failed to connect to the server. Please try again.');
+            }
+
+            // Reset button state
+            btnText.classList.remove('hidden');
+            loading.classList.add('hidden');
+            submitBtn.disabled = false;
+        }
+
+        function formatAnswer(answer) {
+            // Convert newlines to <br> tags for proper display
+            return answer.replace(/\n/g, '<br>');
+        }
+
+        function showError(message) {
+            const errorSection = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            errorText.textContent = message;
+            errorSection.classList.remove('hidden');
+        }
+
+        // Allow Enter key to submit (Shift+Enter for new line)
+        document.getElementById('question-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                submitQuestion();
+            }
+        });
+    </script>
+</body>
+</html>
