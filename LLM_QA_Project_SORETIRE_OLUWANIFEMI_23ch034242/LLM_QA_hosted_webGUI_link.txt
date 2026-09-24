@@ -1,0 +1,38 @@
+Name: SORETIRE OLUWANIFEMI
+Matric Number: 23ch034242
+Live URL: [TO BE UPDATED AFTER DEPLOYMENT]
+GitHub Repository: https://github.com/Oluwanifemi77/pwrshore777
+
+---
+
+DEPLOYMENT INSTRUCTIONS:
+
+To deploy this application on Render.com:
+
+1. Create a free account at https://render.com
+2. Click "New" -> "Web Service"
+3. Connect your GitHub repository
+4. Configure the service:
+   - Name: llm-qa-system
+   - Environment: Python
+   - Build Command: pip install -r requirements.txt
+   - Start Command: gunicorn app:app
+5. Add Environment Variable:
+   - Key: GROQ_API_KEY
+   - Value: [Your Groq API Key from https://console.groq.com/keys]
+6. Click "Create Web Service"
+
+After deployment, update the "Live URL" above with your Render URL.
+
+---
+
+To run the CLI application locally:
+1. Install dependencies: pip install -r requirements.txt
+2. Set API key: export GROQ_API_KEY='your-api-key'
+3. Run: python LLM_QA_CLI.py
+
+To run the Web GUI locally:
+1. Install dependencies: pip install -r requirements.txt
+2. Set API key: export GROQ_API_KEY='your-api-key'
+3. Run: python app.py
+4. Open http://localhost:5000 in your browser
